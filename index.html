@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-61HYEMCB80"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-61HYEMCB80');
-    </script>
+    <!-- Google Analytics loaded conditionally after cookie consent -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SDF Plumbing & Heating Ltd - Trusted Domestic Plumbers & Gas Engineers</title>
@@ -263,6 +256,67 @@
         }
 
         /* Responsive */
+        /* Cookie Banner */
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            color: #f0f0f0;
+            padding: 1.25rem 1.5rem;
+            z-index: 9999;
+            box-shadow: 0 -3px 12px rgba(0,0,0,0.35);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #cookie-banner p {
+            flex: 1 1 300px;
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        #cookie-banner a {
+            color: #FFCC80;
+            text-decoration: underline;
+        }
+
+        .cookie-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .cookie-btn {
+            padding: 0.55rem 1.4rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        .cookie-btn:hover {
+            opacity: 0.85;
+        }
+
+        .cookie-btn-accept {
+            background: #E65100;
+            color: white;
+        }
+
+        .cookie-btn-decline {
+            background: transparent;
+            color: #f0f0f0;
+            border: 1px solid #888;
+        }
+
         @media (max-width: 768px) {
             header h1 {
                 font-size: 1.5rem;
@@ -393,20 +447,93 @@
         </div>
     </section>
 
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" role="dialog" aria-label="Cookie consent" aria-live="polite" style="display:none;">
+        <p>
+            We use cookies to analyse site traffic via Google Analytics. This helps us improve our website.
+            By clicking <strong>Accept</strong>, you consent to the use of analytics cookies.
+            You can <strong>Decline</strong> if you prefer, and no tracking cookies will be set.
+            See our <a href="#cookie-policy" id="cookie-policy-link">cookie policy</a> for details.
+        </p>
+        <div class="cookie-buttons">
+            <button class="cookie-btn cookie-btn-accept" id="cookie-accept">Accept cookies</button>
+            <button class="cookie-btn cookie-btn-decline" id="cookie-decline">Decline</button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="container">
             <p>&copy; 2026 SDF Plumbing & Heating Ltd. All rights reserved.</p>
-            <p>Gas Safe Registered | Serving Wirral, West Cheshire & Merseyside</p>
+            <p>Gas Safe Registered | Serving Wirral, West Cheshire &amp; Merseyside</p>
+            <p style="margin-top:0.5rem; font-size:0.85rem;">
+                <a href="#" id="cookie-settings-link" style="color:rgba(255,255,255,0.75); text-decoration:underline;">Cookie settings</a>
+            </p>
         </div>
     </footer>
 
     <script>
-        // Smooth scrolling for navigation links
+        // ── Cookie Consent ──────────────────────────────────────────
+        const COOKIE_KEY = 'sdf_cookie_consent';
+        const banner = document.getElementById('cookie-banner');
+
+        function loadGoogleAnalytics() {
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-61HYEMCB80';
+            document.head.appendChild(s);
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', 'G-61HYEMCB80');
+        }
+
+        function showBanner() {
+            banner.style.display = 'flex';
+        }
+
+        function hideBanner() {
+            banner.style.display = 'none';
+        }
+
+        // Check stored preference on load
+        var consent = localStorage.getItem(COOKIE_KEY);
+        if (consent === 'accepted') {
+            loadGoogleAnalytics();
+        } else if (consent === 'declined') {
+            // Do nothing – no banner, no tracking
+        } else {
+            // No preference yet – show banner
+            showBanner();
+        }
+
+        document.getElementById('cookie-accept').addEventListener('click', function () {
+            localStorage.setItem(COOKIE_KEY, 'accepted');
+            hideBanner();
+            loadGoogleAnalytics();
+        });
+
+        document.getElementById('cookie-decline').addEventListener('click', function () {
+            localStorage.setItem(COOKIE_KEY, 'declined');
+            hideBanner();
+        });
+
+        // Allow users to reopen the banner via the footer 'Cookie settings' link
+        document.getElementById('cookie-settings-link').addEventListener('click', function (e) {
+            e.preventDefault();
+            localStorage.removeItem(COOKIE_KEY);
+            showBanner();
+        });
+
+        // ── Smooth scrolling ─────────────────────────────────────────
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                // Skip cookie-policy placeholder and settings link
+                if (href === '#cookie-policy' || href === '#') return;
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                const target = document.querySelector(href);
                 if (target) {
                     target.scrollIntoView({
                         behavior: 'smooth',
